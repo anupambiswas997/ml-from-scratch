@@ -1,0 +1,3 @@
+[submodule "external/mathops"]
+	path = external/mathops
+	url = https://github.com/anupambiswas997/mathops
