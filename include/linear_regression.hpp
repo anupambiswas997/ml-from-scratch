@@ -5,6 +5,7 @@ class LinearRegression
 {
 public:
     LinearRegression();
+    void dummy();
 };
 
 #endif
