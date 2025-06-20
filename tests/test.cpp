@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     Matrix m = {};
     Vector v = {};
-    LinearRegression linreg = LinearRegression();
-    linreg.dummy();
+    LinearRegressionSolver linRegSolver = LinearRegressionSolver();
+    linRegSolver.solve({}, {});
     return 0;
 }

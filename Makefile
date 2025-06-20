@@ -22,12 +22,12 @@ $(LIBMATHOPS):
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(OBJDIR)
-	$(CXX) -MMD -MP -I $(INCLUDEDIR) -c $< -o $@
+	$(CXX) -MMD -MP $(CXXFLAGS) -c $< -o $@
 
 -include $(DEPS)
 
 $(TEST): tests/test.cpp $(OBJFILES) $(LIBMATHOPS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ tests/test.cpp $(OBJFILES)
+	$(CXX) $(CXXFLAGS) tests/test.cpp $(OBJFILES) $(LDFLAGS) -o $@
 
 clean:
 	rm -rf $(BUILDDIR)
