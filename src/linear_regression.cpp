@@ -2,6 +2,7 @@
 #include <iostream>
 #include "matrix.hpp"
 #include "sparse_matrix.hpp"
+#include "sparse_vector.hpp"
 
 LinearRegressionSolver::LinearRegressionSolver()
 {
@@ -12,28 +13,20 @@ void LinearRegressionSolver::solve(const Matrix& X, const Vector& y)
 {
     size_t m = X.getNumRows();
     double oneByM = 1.0 / m;
-    Matrix XT = X.getTranspose();//getTranspose(X);
-    SparseMatrix iden(0, m, m);// = getIdentityMatrix(m);
+    Matrix XT = X.getTranspose();
+    SparseMatrix iden(0, m, m);
     for(size_t i = 0; i < m; i++)
     {
         iden[i][i] = 1;
     }
     SparseMatrix U = iden - oneByM;
-    /*
-    for(int i = 0; i < m; i++)
-    {
-        for(int j = 0; j < m; j++)
-        {
-            U[i][j] -= oneByM;
-        }
-    }//*/
-    Matrix XTU = XT * U;//getProductOfMatrices(XT, U);
+    Matrix XTU = XT * U;
     Matrix XTUX = XTU * X;
-    Matrix XTUXinverse = XTUX.getInverse();//getMatrixInverse(getProductOfMatrices(XTU, X));
-    Vector XTUy = XTU * y;//getMatrixVectorProduct(XTU, y);
-    m_weights = XTUXinverse * XTUy;//getMatrixVectorProduct(XTUXinverse, XTUy);
+    Matrix XTUXinverse = XTUX.getInverse();
+    Vector XTUy = XTU * y;
+    m_weights = XTUXinverse * XTUy;
     double sum = 0;
-    Vector Xw = X * m_weights;//getMatrixVectorProduct(X, m_weights);
+    Vector Xw = X * m_weights;
     for(size_t i = 0; i < m; i++)
     {
         sum += (y[i] - Xw[i]);
