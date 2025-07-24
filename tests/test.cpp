@@ -1,6 +1,7 @@
 #include "linear_regression.hpp"
 #include <iostream>
-#include "common_types.hpp"
+#include "matrix.hpp"
+#include "vectr.hpp"
 
 using namespace std;
 

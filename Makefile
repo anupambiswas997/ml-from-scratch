@@ -10,10 +10,11 @@ OBJDIR := $(BUILDDIR)
 SRCDIR := src
 SRCFILES := $(wildcard $(SRCDIR)/*.cpp)
 OBJFILES := $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRCFILES))
-TEST := $(BUILDDIR)/test
+TESTSDIR := tests
+TEST := $(TESTSDIR)/test
 DEPS := $(OBJFILES:.o=.d)
 
-.PHONY := all clean
+.PHONY := all clean test
 
 all: $(OBJFILES) $(TEST) $(LIBMATHOPS)
 
@@ -29,6 +30,9 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 $(TEST): tests/test.cpp $(OBJFILES) $(LIBMATHOPS)
 	$(CXX) $(CXXFLAGS) tests/test.cpp $(OBJFILES) $(LDFLAGS) -o $@
 
+test: $(TEST)
+	./$(TEST)
+
 clean:
-	rm -rf $(BUILDDIR)
+	rm -rf $(BUILDDIR) $(OBJDIR) $(TEST)
 	make -C $(MATHOPS) clean

@@ -1,7 +1,7 @@
 #ifndef LINEAR_REGRESSION_HPP
 #define LINEAR_REGRESSION_HPP
 
-#include "common_types.hpp"
+#include "vectr.hpp"
 
 class LinearRegressionSolver
 {
