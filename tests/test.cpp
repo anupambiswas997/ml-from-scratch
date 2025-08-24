@@ -36,7 +36,21 @@ int main(int argc, char *argv[])
     TestData tData = getDataSet();
     Matrix& X = tData.X;
     Vector& y = tData.y;
-    LinearRegressionSolver linRegSolver = LinearRegressionSolver();
-    linRegSolver.solve(X, y);
+
+    LinearRegressionSolver linRegSolverAnalytical = LinearRegressionSolver();
+    linRegSolverAnalytical.solve(X, y, LinearRegressionSolver::ANALYTICAL);
+    Vector weightsAnalytical = linRegSolverAnalytical.getWeights();
+    double biasAnalytical = linRegSolverAnalytical.getBias();
+
+    LinearRegressionSolver linRegSolverGD = LinearRegressionSolver();
+    linRegSolverGD.solve(X, y, LinearRegressionSolver::GRADIENT_DESCENT);
+    Vector weightsGD = linRegSolverGD.getWeights();
+    double biasGD = linRegSolverGD.getBias();
+
+    ///*
+    LinearRegressionSolver linRegSolverSGD = LinearRegressionSolver();
+    linRegSolverSGD.solve(X, y, LinearRegressionSolver::STOCHASTIC_GRADIENT_DESCENT);
+    Vector weightsSGD = linRegSolverSGD.getWeights();
+    double biasSGD = linRegSolverSGD.getBias();//*/
     return 0;
 }
