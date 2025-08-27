@@ -15,38 +15,39 @@ void testLinearRegression(size_t sampleSize=1000, size_t numFeatures=1)
     Vector noise = getRandomVector(sampleSize, -0.2, 0.2);
     Vector y = ((X * weights) + bias) + noise;
 
-    LinearRegressionSolver linRegSolverAnalytical = LinearRegressionSolver();
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - ANALYTICAL", linRegSolverAnalytical.solve(X, y, LinearRegressionSolver::ANALYTICAL));
-    Vector weightsAnalytical = linRegSolverAnalytical.getWeights();
-    double biasAnalytical = linRegSolverAnalytical.getBias();
+    LinearRegressionSolver linRegSolver = LinearRegressionSolver();
 
-    LinearRegressionSolver linRegSolverGD = LinearRegressionSolver();
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - GRADIENT DESCENT", linRegSolverGD.solve(X, y, LinearRegressionSolver::BATCH_GRADIENT_DESCENT));
-    Vector weightsGD = linRegSolverGD.getWeights();
-    double biasGD = linRegSolverGD.getBias();
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - ANALYTICAL", linRegSolver.solveAnalytical(X, y));
+    Vector weightsAnalytical = linRegSolver.getWeights();
+    double biasAnalytical = linRegSolver.getBias();
 
-    ///*
-    LinearRegressionSolver linRegSolverSGD = LinearRegressionSolver();
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - STOCHASTIC GRADIENT DESCENT", linRegSolverSGD.solve(X, y, LinearRegressionSolver::STOCHASTIC_GRADIENT_DESCENT));
-    Vector weightsSGD = linRegSolverSGD.getWeights();
-    double biasSGD = linRegSolverSGD.getBias();
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - BATCH GRADIENT DESCENT", linRegSolver.solveGradientDescent(X, y));
+    Vector weightsBGD = linRegSolver.getWeights();
+    double biasBGD = linRegSolver.getBias();
 
-    std::cout << "WEIGHTS:" << std::endl;
-    std::cout << "actual:" << std::endl << weights.getText() << std::endl;
-    std::cout << "analytical:" << std::endl << weightsAnalytical.getText() << std::endl;
-    std::cout << "gradient descent:" << std::endl << weightsGD.getText() << std::endl;
-    std::cout << "stochastic gradient descent:" << std::endl << weightsSGD.getText() << std::endl;
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - STOCHASTIC GRADIENT DESCENT", linRegSolver.solveGradientDescent(X, y, size_t(0.4 * sampleSize)));
+    Vector weightsSGD = linRegSolver.getWeights();
+    double biasSGD = linRegSolver.getBias();
 
-    std::cout << "BIAS:" << std::endl;
-    std::cout << "actual:" << std::endl << bias << std::endl;
-    std::cout << "analytical:" << std::endl << biasAnalytical << std::endl;
-    std::cout << "gradient descent:" << std::endl << biasGD << std::endl;
-    std::cout << "stochastic gradient descent:" << std::endl << biasSGD << std::endl;
-    //*/
+    std::vector<std::string> headers = {"", "ACTUAL", "ANALYTICAL", "BATCH-GD", "STOCHASTIC-GD"};
+    std::vector<std::vector<std::string> > data = {};
+    data.push_back({"bias", std::to_string(bias), std::to_string(biasAnalytical), std::to_string(biasBGD), std::to_string(biasSGD)});
+
+    for(size_t i = 0; i < numFeatures; i++)
+    {
+        std::string weightName = "weight-" + std::to_string(i);
+        std::string wAct = std::to_string(weights[i]);
+        std::string wAna = std::to_string(weightsAnalytical[i]);
+        std::string wBGD = std::to_string(weightsBGD[i]);
+        std::string wSGD = std::to_string(weightsSGD[i]);
+        data.push_back({weightName, wAct, wAna, wBGD, wSGD});
+    }
+    std::cout << std::endl << getTableText(data, headers) << std::endl;
 }
 
 int main(int argc, char *argv[])
 {
-    testLinearRegression();
+    srand(time(NULL));
+    testLinearRegression(1000, 5);
     return 0;
 }

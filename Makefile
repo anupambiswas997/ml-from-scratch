@@ -27,7 +27,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 
 -include $(DEPS)
 
-$(TEST): tests/test.cpp $(OBJFILES) $(LIBMATHOPS)
+$(TEST): tests/test.cpp tests/test_utils.hpp $(OBJFILES) $(LIBMATHOPS)
 	$(CXX) $(CXXFLAGS) tests/test.cpp $(OBJFILES) $(LDFLAGS) -o $@
 
 test: $(TEST)
