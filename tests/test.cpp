@@ -21,7 +21,7 @@ void testLinearRegression(size_t sampleSize=1000, size_t numFeatures=1)
     double biasAnalytical = linRegSolverAnalytical.getBias();
 
     LinearRegressionSolver linRegSolverGD = LinearRegressionSolver();
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - GRADIENT DESCENT", linRegSolverGD.solve(X, y, LinearRegressionSolver::GRADIENT_DESCENT));
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - GRADIENT DESCENT", linRegSolverGD.solve(X, y, LinearRegressionSolver::BATCH_GRADIENT_DESCENT));
     Vector weightsGD = linRegSolverGD.getWeights();
     double biasGD = linRegSolverGD.getBias();
 
