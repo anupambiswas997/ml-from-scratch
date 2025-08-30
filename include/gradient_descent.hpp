@@ -35,6 +35,21 @@ public:
     }
 };
 
-void solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance=1.0e-8, size_t maxNumIterations=100000);
+typedef struct GDSolutionStruct
+{
+    Vector weights;
+    double bias;
+    size_t iterationsCompleted;
+    double lastMaxIncrement;
+    GDSolutionStruct(const Vector& we, double bi, size_t numIters, double lastInc)
+    {
+        weights = we;
+        bias = bi;
+        iterationsCompleted = numIters;
+        lastMaxIncrement = lastInc;
+    }
+} GDSolution;
+
+GDSolution solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance=1.0e-8, size_t maxNumIterations=100000);
 
 #endif

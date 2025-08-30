@@ -2,7 +2,7 @@
 #include "random_quantities.hpp"
 #include <cmath>
 
-void solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance, size_t maxNumIterations)
+GDSolution solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance, size_t maxNumIterations)
 {
     // Initialize bias and weights.
     double bias = getRandom();
@@ -14,24 +14,6 @@ void solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeig
     double maxIncrement;
     bool incrementCond;
     bool iterCond;
-
-    // Gradient descent is performed with:
-    //   * entire X, when isStochastic = false
-    //   * randomly chosen numStochasticSamples entries of X, when isStochastic = true
-    //bool isStochastic = (numStochasticSamples > 0);
-
-    // Indexer object helps to:
-    //   * randomly select numStochasticSamples entries from X for stochastic GD (isStochastic = true)
-    //   * just get all entries in the case of batch GD (isStochastic = false)
-    //Indexer indexer(X.getNumRows(), isStochastic);
-
-    // For partial derivative calculations in every iteration of GD, the number
-    // of data entries (numRows) to take into account depends on whether stochastic or batch GD
-    // is being performed.
-    //size_t numRows = isStochastic ? numStochasticSamples : X.getNumRows();
-    //size_t numColumns = X.getNumColumns();
-    //double mInv = 1.0 / numRows;
-    //double mInvNegLR = -mInv * learningRate;
 
     while(cond)
     {
@@ -62,4 +44,5 @@ void solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeig
     std::cout << "    Maximum number of iterations: " << maxNumIterations << std::endl;
     std::cout << "    Last absolute weights/bias increment: " << maxIncrement << std::endl;
     std::cout << "    Error tolerance used: " << tolerance << std::endl;//*/
+    return GDSolution(weights, bias, iterationCount, maxIncrement);
 }
