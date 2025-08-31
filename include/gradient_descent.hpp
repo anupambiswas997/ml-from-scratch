@@ -50,6 +50,6 @@ typedef struct GDSolutionStruct
     }
 } GDSolution;
 
-GDSolution solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance=1.0e-8, size_t maxNumIterations=100000);
+GDSolution getGDSolution(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance=1.0e-8, size_t maxNumIterations=100000);
 
 #endif

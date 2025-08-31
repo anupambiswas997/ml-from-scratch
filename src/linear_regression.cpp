@@ -5,6 +5,8 @@
 #include "sparse_vector.hpp"
 #include "random_quantities.hpp"
 #include <cmath>
+#include "gradient_descent.hpp"
+#include "index_shuffler.hpp"
 
 Indexer::Indexer(size_t size, bool doShuffle)
 {
@@ -66,6 +68,84 @@ void LinearRegressionSolver::solveAnalytical(const Matrix& X, const Vector& y)
     m_bias = oneByM * sum;
 }
 
+// GDSolution solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance, size_t maxNumIterations)
+class LinearRegressionGDIncrementsEvaluator: virtual public IGDIncrementsEvaluator
+{
+    IndexShuffler m_indexer;
+    size_t m_numSamples;
+    double m_learningRate;
+    bool m_isStochastic;
+    size_t m_numRows;
+    size_t m_numColumns;
+    size_t m_mInv;
+    size_t m_mInvNegLR;
+    const Matrix* m_pX;
+    const Vector* m_py;
+    const Vector* m_pWeightVals;
+    const double* m_pBiasVal;
+public:
+    LinearRegressionGDIncrementsEvaluator(const Matrix& X, const Vector& y, const Vector& weights, const double& bias, size_t numStochasticSamples, double learningRate)
+    :m_numSamples(numStochasticSamples),
+    m_learningRate(learningRate),
+    m_isStochastic(numStochasticSamples > 0),
+    m_indexer(X.getNumRows(), (numStochasticSamples > 0)),
+    m_pX(&X),
+    m_py(&y)
+    {
+        m_numRows = (numStochasticSamples > 0) ? numStochasticSamples : X.getNumRows();
+        m_numColumns = X.getNumColumns();
+        m_mInv = 1.0 / m_numRows;
+        m_mInvNegLR = -m_mInv * learningRate;
+    }
+    /*void evaluateIncrements(double bias)
+    {
+        m_biasVal = bias;
+        evaluateIncrements();
+    }//*/
+    virtual void evaluateIncrements()
+    {
+        // If this is stochastic gradient descent, then calling update will
+        // shuffle the rows of the indexer object, allowing for a random but smaller
+        // selection of data entries, for this iteration's calculations. Otherwise,
+        // calling update will not affect the indexer object, i.e. calling
+        // indexer.getIndex(i) will return i;
+        m_indexer.update();
+        // error vector
+        std::vector<double> err = {};
+        for(size_t i = 0; i < m_numRows; i++)
+        {
+            size_t iActual = m_indexer.getIndex(i);
+            double sum = *m_pBiasVal - m_py->getData()[iActual];
+            for(size_t j = 0; j < m_numColumns; j++)
+            {
+                sum += m_pX->getData()[iActual][j] * m_pWeightVals->getData()[j];
+            }
+            err.push_back(sum);
+        }
+        std::vector<double> dCdwVec = {};
+        for(size_t i = 0; i < m_numColumns; i++)
+        {
+            double sum = 0;
+            for(size_t j = 0; j < m_numRows; j++)
+            {
+                // sum += (X-transpose[i][indexer.getIndex(j)] times err[j])
+                // but X-transpose[i][indexer.getIndex(j)] = X[indexer.getIndex(j)][i]
+                sum += (m_pX->getData()[m_indexer.getIndex(j)][i] * err[j]);
+            }
+            dCdwVec.push_back(sum);
+        }
+
+        // Partial derivative of cost function w.r.t. weights: dCdw = Xsam-transpose * err / numRows
+        // Xsam -> entire X or sampled X in case of stochastic gradient descent
+        // Increment in weights for gradient descent: dCdw * negative-learning-rate
+        m_weightIncrements = Vector(dCdwVec) * m_mInvNegLR;
+
+        // Partial derivative of cost function w.r.t. bias: dCdb = SUM(err) / numRows
+        // Increment in bias for gradiant descent: dCdb * negative-learning-rate
+        m_biasIncrement = Vector(err).getSum() * m_mInvNegLR;
+    }
+};
+
 void LinearRegressionSolver::solveGradientDescent(const Matrix& X, const Vector& y, size_t numStochasticSamples, double learningRate, double tolerance, size_t maxNumIterations)
 {
     // Initialize bias and weights.
@@ -97,6 +177,13 @@ void LinearRegressionSolver::solveGradientDescent(const Matrix& X, const Vector&
     double mInv = 1.0 / numRows;
     double mInvNegLR = -mInv * learningRate;
 
+    LinearRegressionGDIncrementsEvaluator gdincEvaluator(X, y, m_weights, m_bias, numStochasticSamples, learningRate);
+    // GDSolution solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance, size_t maxNumIterations)
+    GDSolution solution = getGDSolution(&gdincEvaluator, X.getNumColumns(), tolerance, maxNumIterations);
+    m_weights = solution.weights;
+    m_bias = solution.bias;
+    return;
+
     while(cond)
     {
         // If this is stochastic gradient descent, then calling update will
@@ -104,6 +191,9 @@ void LinearRegressionSolver::solveGradientDescent(const Matrix& X, const Vector&
         // selection of data entries, for this iteration's calculations. Otherwise,
         // calling update will not affect the indexer object, i.e. calling
         // indexer.getIndex(i) will return i;
+
+        gdincEvaluator.evaluateIncrements();
+
         indexer.update();
         // error vector
         std::vector<double> err = {};

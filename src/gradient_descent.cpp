@@ -2,7 +2,7 @@
 #include "random_quantities.hpp"
 #include <cmath>
 
-GDSolution solveGradientDescent(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance, size_t maxNumIterations)
+GDSolution getGDSolution(IGDIncrementsEvaluator *gdincEvaluator, size_t numWeights, double tolerance, size_t maxNumIterations)
 {
     // Initialize bias and weights.
     double bias = getRandom();
