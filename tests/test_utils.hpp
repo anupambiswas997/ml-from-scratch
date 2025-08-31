@@ -20,6 +20,17 @@ long long getMicroSeconds()
     return std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
 }
 
+typedef void (*NoParamsFuncP)();
+
+// This function returns time taken by testFunc, in milliseconds.
+double timeTest(const NoParamsFuncP& testFunc)
+{
+    auto startTime = getMicroSeconds();
+    testFunc();
+    auto endTime = getMicroSeconds();
+    return (endTime - startTime) / 1000.0;
+}
+
 std::string getPaddedString(std::string word, size_t maxLen)
 {
     return (maxLen > word.length()) ? (std::string(maxLen - word.length(), ' ') + word) : word;
