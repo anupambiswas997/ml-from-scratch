@@ -15,19 +15,25 @@ void testLinearRegression(size_t sampleSize=1000, size_t numFeatures=1)
     Vector noise = getRandomVector(sampleSize, -0.2, 0.2);
     Vector y = ((X * weights) + bias) + noise;
 
-    LinearRegressionSolver linRegSolver = LinearRegressionSolver();
+    LinearRegressionSolver linRegSolverAna = LinearRegressionSolver();
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - ANALYTICAL", linRegSolverAna.solve(X, y));
+    Vector weightsAnalytical = linRegSolverAna.getWeights();
+    double biasAnalytical = linRegSolverAna.getBias();
 
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - ANALYTICAL", linRegSolver.solveAnalytical(X, y));
-    Vector weightsAnalytical = linRegSolver.getWeights();
-    double biasAnalytical = linRegSolver.getBias();
+    double learningRate = 1.0e-4;
+    size_t numStochasticSamples = 0; // as it is BGD and hence uses full batch
+    size_t maxNumIterations = 100000;
+    double tolerance = 1.0e-8;
+    LinearRegressionGDSolver linRegSolverBGD = LinearRegressionGDSolver(X, y, learningRate, numStochasticSamples, maxNumIterations, tolerance);
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - BATCH GRADIENT DESCENT", linRegSolverBGD.solve());
+    Vector weightsBGD = linRegSolverBGD.getWeights();
+    double biasBGD = linRegSolverBGD.getBias();
 
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - BATCH GRADIENT DESCENT", linRegSolver.solveGradientDescent(X, y));
-    Vector weightsBGD = linRegSolver.getWeights();
-    double biasBGD = linRegSolver.getBias();
-
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - STOCHASTIC GRADIENT DESCENT", linRegSolver.solveGradientDescent(X, y, size_t(0.4 * sampleSize)));
-    Vector weightsSGD = linRegSolver.getWeights();
-    double biasSGD = linRegSolver.getBias();
+    numStochasticSamples = size_t(0.4 * sampleSize);
+    LinearRegressionGDSolver linRegSolverSGD = LinearRegressionGDSolver(X, y, learningRate, numStochasticSamples, maxNumIterations, tolerance);
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - STOCHASTIC GRADIENT DESCENT", linRegSolverSGD.solve());
+    Vector weightsSGD = linRegSolverSGD.getWeights();
+    double biasSGD = linRegSolverSGD.getBias();
 
     std::vector<std::string> headers = {"", "ACTUAL", "ANALYTICAL", "BATCH-GD", "STOCHASTIC-GD"};
     std::vector<std::vector<std::string> > data = {};
