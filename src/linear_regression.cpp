@@ -8,15 +8,15 @@
 #include "gradient_descent.hpp"
 #include "index_shuffler.hpp"
 
-LinearRegressionGDSolver::LinearRegressionGDSolver(const Matrix& X, const Vector& y, double learningRate, size_t numStochasticSamples, size_t maxNumIterations, double tolerance)
-:IGradientDescentSolver(X, y, maxNumIterations, tolerance),
-m_indexer(X.getNumRows(), (numStochasticSamples > 0)),
+LinearRegressionGDSolver::LinearRegressionGDSolver(size_t numRows, size_t numColumns, double learningRate, size_t numStochasticSamples, size_t maxNumIterations, double tolerance)
+:IGradientDescentSolver(maxNumIterations, tolerance),
+m_indexer(numRows, (numStochasticSamples > 0)),
 m_learningRate(learningRate),
 m_isStochastic(numStochasticSamples > 0)
 {
     // add assert later: numStochasticSamples < X.getNumRows()
-    m_numRows = (numStochasticSamples > 0) ? numStochasticSamples : X.getNumRows();
-    m_numColumns = X.getNumColumns();
+    m_numRows = (numStochasticSamples > 0) ? numStochasticSamples : numRows;
+    m_numColumns = numColumns;
     m_mInv = 1.0 / m_numRows;
     m_mInvNegLR = -m_mInv * m_learningRate;
 }

@@ -24,14 +24,14 @@ void testLinearRegression(size_t sampleSize=1000, size_t numFeatures=1)
     size_t numStochasticSamples = 0; // as it is BGD and hence uses full batch
     size_t maxNumIterations = 100000;
     double tolerance = 1.0e-8;
-    LinearRegressionGDSolver linRegSolverBGD = LinearRegressionGDSolver(X, y, learningRate, numStochasticSamples, maxNumIterations, tolerance);
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - BATCH GRADIENT DESCENT", linRegSolverBGD.solve());
+    LinearRegressionGDSolver linRegSolverBGD = LinearRegressionGDSolver(sampleSize, numFeatures, learningRate, numStochasticSamples, maxNumIterations, tolerance);
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - BATCH GRADIENT DESCENT", linRegSolverBGD.solve(X, y));
     Vector weightsBGD = linRegSolverBGD.getWeights();
     double biasBGD = linRegSolverBGD.getBias();
 
     numStochasticSamples = size_t(0.4 * sampleSize);
-    LinearRegressionGDSolver linRegSolverSGD = LinearRegressionGDSolver(X, y, learningRate, numStochasticSamples, maxNumIterations, tolerance);
-    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - STOCHASTIC GRADIENT DESCENT", linRegSolverSGD.solve());
+    LinearRegressionGDSolver linRegSolverSGD = LinearRegressionGDSolver(sampleSize, numFeatures, learningRate, numStochasticSamples, maxNumIterations, tolerance);
+    SHOW_TIME_ELAPSED("\nLINEAR REGRESSION - STOCHASTIC GRADIENT DESCENT", linRegSolverSGD.solve(X, y));
     Vector weightsSGD = linRegSolverSGD.getWeights();
     double biasSGD = linRegSolverSGD.getBias();
 
