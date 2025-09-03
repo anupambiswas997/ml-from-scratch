@@ -23,7 +23,7 @@ long long getMicroSeconds()
 typedef void (*NoParamsFuncP)();
 
 // This function returns time taken by testFunc, in milliseconds.
-double timeTest(const NoParamsFuncP& testFunc)
+double getTestTime(const NoParamsFuncP& testFunc)
 {
     auto startTime = getMicroSeconds();
     testFunc();
