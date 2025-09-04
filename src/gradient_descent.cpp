@@ -33,8 +33,6 @@ void IGradientDescentSolver::log() const
 
 void IGradientDescentSolver::solve(const Matrix& X, const Vector& y)
 {
-    //m_pX = &X;
-    //m_py = &y;
     // Initialize bias and weights.
     m_bias = getRandom();
     m_weights = getRandomVector(X.getNumColumns());
@@ -52,14 +50,4 @@ void IGradientDescentSolver::solve(const Matrix& X, const Vector& y)
         cond = shouldContinueIterating();
         log();
     }
-}
-
-const Vector& IGradientDescentSolver::getWeights() const
-{
-    return m_weights;
-}
-
-double IGradientDescentSolver::getBias() const
-{
-    return m_bias;
 }

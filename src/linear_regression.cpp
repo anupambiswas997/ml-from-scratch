@@ -98,13 +98,3 @@ void LinearRegressionSolver::solve(const Matrix& X, const Vector& y)
     }
     m_bias = oneByM * sum;
 }
-
-const Vector& LinearRegressionSolver::getWeights() const
-{
-    return m_weights;
-}
-
-double LinearRegressionSolver::getBias() const
-{
-    return m_bias;
-}

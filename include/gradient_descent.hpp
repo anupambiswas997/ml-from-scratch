@@ -2,12 +2,11 @@
 #define GRADIENT_DESCENT_HPP
 
 #include "vectr.hpp"
+#include "simple_solver.hpp"
 
-class IGradientDescentSolver
+class IGradientDescentSolver: virtual public SimpleSolver
 {
 protected:
-    Vector m_weights;
-    double m_bias;
     Vector m_weightIncrements;
     double m_biasIncrement;
     size_t m_iterationCount;
@@ -20,8 +19,6 @@ public:
     virtual bool shouldContinueIterating();
     virtual void log() const;
     virtual void solve(const Matrix& X, const Vector& y);
-    const Vector& getWeights() const;
-    double getBias() const;
 };
 
 #endif

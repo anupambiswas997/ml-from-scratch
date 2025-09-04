@@ -4,6 +4,7 @@
 #include "vectr.hpp"
 #include "gradient_descent.hpp"
 #include "index_shuffler.hpp"
+#include "simple_solver.hpp"
 
 class LinearRegressionGDSolver: virtual public IGradientDescentSolver
 {
@@ -22,15 +23,11 @@ public:
     virtual void solve(const Matrix& X, const Vector& y);
 };
 
-class LinearRegressionSolver
+class LinearRegressionSolver: virtual public SimpleSolver
 {
-    Vector m_weights;
-    double m_bias;
 public:
     LinearRegressionSolver();
-    void solve(const Matrix& X, const Vector& y);
-    const Vector& getWeights() const;
-    double getBias() const;
+    virtual void solve(const Matrix& X, const Vector& y);
 };
 
 #endif
