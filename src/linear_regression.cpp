@@ -8,17 +8,26 @@
 #include "gradient_descent.hpp"
 #include "index_shuffler.hpp"
 
-LinearRegressionGDSolver::LinearRegressionGDSolver(size_t numRows, size_t numColumns, double learningRate, size_t numStochasticSamples, size_t maxNumIterations, double tolerance)
+LinearRegressionGDSolver::LinearRegressionGDSolver(double learningRate, size_t numStochasticSamples, size_t maxNumIterations, double tolerance)
 :IGradientDescentSolver(maxNumIterations, tolerance),
-m_indexer(numRows, (numStochasticSamples > 0)),
+m_indexer(0, false),
 m_learningRate(learningRate),
-m_isStochastic(numStochasticSamples > 0)
+m_numStochasticSamples(numStochasticSamples)
 {
+}
+
+void LinearRegressionGDSolver::solve(const Matrix& X, const Vector& y)
+{
+    m_pX = &X;
+    m_py = &y;
+    bool isStochastic = (m_numStochasticSamples > 0);
+    m_indexer = IndexShuffler(X.getNumRows(), isStochastic);
     // add assert later: numStochasticSamples < X.getNumRows()
-    m_numRows = (numStochasticSamples > 0) ? numStochasticSamples : numRows;
-    m_numColumns = numColumns;
+    m_numRows = isStochastic ? m_numStochasticSamples : X.getNumRows();
+    m_numColumns = X.getNumColumns();
     m_mInv = 1.0 / m_numRows;
     m_mInvNegLR = -m_mInv * m_learningRate;
+    IGradientDescentSolver::solve(X, y);
 }
 
 void LinearRegressionGDSolver::evaluateIncrements()

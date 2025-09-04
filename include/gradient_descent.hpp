@@ -6,9 +6,6 @@
 class IGradientDescentSolver
 {
 protected:
-    // This class needs read access to source data and target.
-    const Matrix* m_pX;
-    const Vector* m_py;
     Vector m_weights;
     double m_bias;
     Vector m_weightIncrements;
@@ -18,7 +15,7 @@ protected:
     double m_tolerance;
     double m_maxIncrement;
 public:
-    IGradientDescentSolver(size_t numIterations=10000, double tolerance=1.0e-8);
+    IGradientDescentSolver(size_t numIterations, double tolerance);
     virtual void evaluateIncrements() = 0;
     virtual bool shouldContinueIterating();
     virtual void log() const;

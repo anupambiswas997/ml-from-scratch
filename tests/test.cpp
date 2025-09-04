@@ -44,11 +44,11 @@ void testLinearRegression(size_t sampleSize=1000, size_t numFeatures=1)
     size_t numStochasticSamples = 0; // as it is BGD and hence uses full batch
     size_t maxNumIterations = 100000;
     double tolerance = 1.0e-8;
-    LinearRegressionGDSolver linRegSolverBGD = LinearRegressionGDSolver(sampleSize, numFeatures, learningRate, numStochasticSamples, maxNumIterations, tolerance);
+    LinearRegressionGDSolver linRegSolverBGD = LinearRegressionGDSolver(learningRate, numStochasticSamples, maxNumIterations, tolerance);
     LinRegResult lrBGD = getLinearRegressionTestResults(linRegSolverBGD, X, y);
 
     numStochasticSamples = size_t(0.4 * sampleSize);
-    LinearRegressionGDSolver linRegSolverSGD = LinearRegressionGDSolver(sampleSize, numFeatures, learningRate, numStochasticSamples, maxNumIterations, tolerance);
+    LinearRegressionGDSolver linRegSolverSGD = LinearRegressionGDSolver(learningRate, numStochasticSamples, maxNumIterations, tolerance);
     LinRegResult lrSGD = getLinearRegressionTestResults(linRegSolverSGD, X, y);
 
     std::vector<std::string> headers = {"", "ACTUAL", "ANALYTICAL", "BATCH-GD", "STOCHASTIC-GD"};
