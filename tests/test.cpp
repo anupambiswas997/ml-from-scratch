@@ -1,4 +1,5 @@
 #include "linear_regression.hpp"
+#include "logistic_regression_solver.hpp"
 #include <iostream>
 #include "matrix.hpp"
 #include "vectr.hpp"
@@ -68,9 +69,41 @@ void testLinearRegression(size_t sampleSize=1000, size_t numFeatures=1)
     std::cout << std::endl << getTableText(data, headers) << std::endl;
 }
 
+void testLogisticRegression(size_t sampleSize=1000, size_t numFeatures=1)
+{
+    Vector plane = getRandomVector(numFeatures, -3, 3);
+    std::vector<std::vector<double> > Xdata = {};
+    std::vector<double> ydata = {};
+    for(size_t i = 0; i < sampleSize; i++)
+    {
+        double d = getRandom(-5, 5);
+        ydata.push_back((d > 0) ? 1 : 0);
+        std::vector<double> curData = {};
+        double sum = 0;
+        for(size_t j = 0; j < (numFeatures - 1); j++)
+        {
+            double val = getRandom(-5, 5);
+            curData.push_back(val);
+            sum += val * plane.getData()[j];
+        }
+        curData.push_back(d - sum);
+    }
+    Matrix X = Matrix(Xdata);
+    Vector y = Vector(ydata);
+
+    double learningRate = 1.0e-4;
+    size_t numStochasticSamples = size_t(0.5 * sampleSize);
+    size_t maxNumIterations = 100000;
+    double tolerance = 1.0e-8;
+    LogisticRegressionSolver logRegSolver(learningRate, numStochasticSamples, maxNumIterations, tolerance);
+    logRegSolver.solve(X, y);
+    //logRegSolver.predict(getRandomVector(numFeatures));
+}
+
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
     testLinearRegression(1000, 5);
+    testLogisticRegression(1000, 3);
     return 0;
 }

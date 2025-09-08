@@ -51,3 +51,36 @@ void LogisticRegressionSolver::solve(const Matrix& X, const Vector& y)
     setData(X, y);
     IGradientDescentSolver::solve(X, y);
 }
+
+Vector LogisticRegressionSolver::getProbability(const Matrix& X) const
+{
+    Vector temp = SimpleSolver::predict(X);
+    std::vector<double> res = {};
+    for(size_t i = 0; i < X.getNumRows(); i++)
+    {
+        res.push_back(sigmoid(temp.getData()[i]));
+    }
+    return Vector(res);
+}
+
+double LogisticRegressionSolver::getProbability(const Vector& xrow) const
+{
+    return sigmoid(SimpleSolver::predict(xrow));
+}
+
+Vector LogisticRegressionSolver::predict(const Matrix& X) const
+{
+    Vector temp = getProbability(X);
+    std::vector<double> res = {};
+    for(size_t i = 0; i < X.getNumRows(); i++)
+    {
+        bool isOne = (temp.getData()[i] > 0.5);
+        res.push_back(isOne ? 1 : 0);
+    }
+    return Vector(res);
+}
+
+double LogisticRegressionSolver::predict(const Vector& xrow) const
+{
+    return (getProbability(xrow) > 0.5) ? 1 : 0;
+}

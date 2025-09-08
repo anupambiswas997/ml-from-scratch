@@ -23,9 +23,9 @@ public:
     {
         return (X * m_weights) + m_bias;
     }
-    virtual double predict(const Vector& y) const
+    virtual double predict(const Vector& xrow) const
     {
-        return y.dot(m_weights) + m_bias;
+        return xrow.dot(m_weights) + m_bias;
     }
 };
 
