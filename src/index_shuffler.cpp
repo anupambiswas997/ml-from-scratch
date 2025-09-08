@@ -1,6 +1,12 @@
 #include "index_shuffler.hpp"
 #include <cstdlib>
 
+IndexShuffler::IndexShuffler()
+{
+    m_indices = {};
+    m_doShuffle = false;
+}
+
 IndexShuffler::IndexShuffler(size_t size, bool doShuffle)
 {
     m_indices = {};
