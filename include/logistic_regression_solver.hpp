@@ -3,8 +3,11 @@
 
 #include "vectr.hpp"
 #include "gradient_descent.hpp"
+#include "gradient_descent_data.hpp"
 
-class LogisticRegressionSolver: virtual public IGradientDescentSolver
+class LogisticRegressionSolver:
+    virtual public IGradientDescentSolver,
+    virtual public GradientDescentData
 {
 public:
     LogisticRegressionSolver(double learningRate=1e-4, size_t numStochasticSamples=0, size_t maxNumIterations=100000, double tolerance=1e-8);

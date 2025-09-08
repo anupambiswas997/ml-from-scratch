@@ -7,7 +7,9 @@
 #include "simple_solver.hpp"
 #include "gradient_descent_data.hpp"
 
-class LinearRegressionGDSolver: virtual public IGradientDescentSolver, virtual public GradientDescentData
+class LinearRegressionGDSolver:
+    virtual public IGradientDescentSolver,
+    virtual public GradientDescentData
 {
 public:
     LinearRegressionGDSolver(double learningRate=1e-4, size_t numStochasticSamples=0, size_t maxNumIterations=100000, double tolerance=1e-8);
