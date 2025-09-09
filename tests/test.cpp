@@ -5,6 +5,8 @@
 #include "vectr.hpp"
 #include "random_quantities.hpp"
 #include "test_utils.hpp"
+#include <cmath>
+#include <cassert>
 
 using namespace std;
 
@@ -69,35 +71,84 @@ void testLinearRegression(size_t sampleSize=1000, size_t numFeatures=1)
     std::cout << std::endl << getTableText(data, headers) << std::endl;
 }
 
-void testLogisticRegression(size_t sampleSize=1000, size_t numFeatures=1)
+void getLogisticRegressionData(size_t sampleSize, size_t numFeatures, const Vector& planeNormal, double planeDistance, std::vector<bool>& yB, std::vector<std::vector<double> >& Xdata)
 {
-    Vector plane = getRandomVector(numFeatures, -3, 3);
-    std::vector<std::vector<double> > Xdata = {};
-    std::vector<double> ydata = {};
+    size_t lastFeatureIndex = numFeatures - 1;
     for(size_t i = 0; i < sampleSize; i++)
     {
         double d = getRandom(-5, 5);
-        ydata.push_back((d > 0) ? 1 : 0);
+        yB.push_back((d > 0));
         std::vector<double> curData = {};
         double sum = 0;
-        for(size_t j = 0; j < (numFeatures - 1); j++)
+        for(size_t j = 0; j < lastFeatureIndex; j++)
         {
             double val = getRandom(-5, 5);
             curData.push_back(val);
-            sum += val * plane.getData()[j];
+            sum += val * planeNormal[j];
         }
-        curData.push_back(d - sum);
+        double lastElement = (d + planeDistance - sum) / planeNormal[lastFeatureIndex];
+        curData.push_back(lastElement);
+        Xdata.push_back(curData);
     }
-    Matrix X = Matrix(Xdata);
-    Vector y = Vector(ydata);
+}
+
+void testLogisticRegression(size_t sampleSize=1000, size_t numFeatures=1)
+{
+    Vector planePerp = getRandomVector(numFeatures, -3, 3);
+    double planeDist = getRandom(0, 5);
+    // test condition - last plane parameter shouldn't be too small in magnitude
+    // this condition could be applied for any index arbitrarily
+    // but for testing simplicity, being applied to the last index
+    assert(fabs(planePerp[numFeatures - 1]) > 1.0e-6);
+
+    std::vector<std::vector<double> > XTrainData = {};
+    std::vector<bool> yBTrain = {};
+    size_t lastFeatureIndex = numFeatures - 1;
+    getLogisticRegressionData(sampleSize, numFeatures, planePerp, planeDist, yBTrain, XTrainData);
+    Matrix XTrain = Matrix(XTrainData);
 
     double learningRate = 1.0e-4;
     size_t numStochasticSamples = size_t(0.5 * sampleSize);
     size_t maxNumIterations = 100000;
     double tolerance = 1.0e-8;
     LogisticRegressionSolver logRegSolver(learningRate, numStochasticSamples, maxNumIterations, tolerance);
-    logRegSolver.solve(X, y);
-    //logRegSolver.predict(getRandomVector(numFeatures));
+    logRegSolver.solve(XTrain, yBTrain);
+
+    std::vector<std::vector<double> > XTestData = {};
+    std::vector<bool> yBTest = {};
+    size_t testSize = 100;
+    getLogisticRegressionData(testSize, numFeatures, planePerp, planeDist, yBTest, XTestData);
+    Matrix XTest = Matrix(XTestData);
+    std::vector<bool> yBPredict = logRegSolver.predictB(XTest);
+    size_t numTruePositive = 0;
+    size_t numTrueNegative = 0;
+    size_t numFalsePositive = 0;
+    size_t numFalseNegative = 0;
+    for(size_t i = 0; i < testSize; i++)
+    {
+        if(yBTest[i] && yBPredict[i])
+        {
+            numTruePositive++;
+        }
+        else if(yBTest[i] && (!yBPredict[i]))
+        {
+            numFalseNegative++;
+        }
+        else if((!yBTest[i]) && yBPredict[i])
+        {
+            numFalsePositive++;
+        }
+        else if((!yBTest[i]) && (!yBPredict[i]))
+        {
+            numTrueNegative++;
+        }
+    }
+    std::vector<std::vector<std::string> > data = {};
+    std::vector<std::string> headers = {"", "TRUE-PREDICTED", "FALSE-PREDICTED"};
+    data.push_back({"TRUE-ACTUAL", std::to_string(numTruePositive), std::to_string(numFalseNegative)});
+    data.push_back({"FALSE-ACTUAL", std::to_string(numFalsePositive), std::to_string(numTrueNegative)});
+    std::cout << std::endl << "Logistic regression test" << std::endl << "CONFUSION MATRIX:" << std::endl;
+    std::cout << getTableText(data, headers) << std::endl;
 }
 
 int main(int argc, char *argv[])

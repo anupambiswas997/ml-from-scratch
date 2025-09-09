@@ -84,3 +84,28 @@ double LogisticRegressionSolver::predict(const Vector& xrow) const
 {
     return (getProbability(xrow) > 0.5) ? 1 : 0;
 }
+
+void LogisticRegressionSolver::solve(const Matrix& X, const std::vector<bool>& yB)
+{
+    std::vector<double> yvec = {};
+    for(size_t i = 0; i < yB.size(); i++)
+    {
+        yvec.push_back(yB[i] ? 1 : 0);
+    }
+    solve(X, Vector(yvec));
+}
+
+bool LogisticRegressionSolver::predictB(const Vector& xrow) const
+{
+    return (getProbability(xrow) > 0.5);
+}
+
+std::vector<bool> LogisticRegressionSolver::predictB(const Matrix& X) const
+{
+    std::vector<bool> res = {};
+    for(size_t i = 0; i < X.getNumRows(); i++)
+    {
+        res.push_back(predictB(Vector(X.getData()[i])));
+    }
+    return res;
+}
