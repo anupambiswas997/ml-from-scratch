@@ -1,10 +1,11 @@
 #include "linear_regression.hpp"
+#include "linear_regression_GD_solver.hpp"
 #include "logistic_regression_solver.hpp"
-#include <iostream>
 #include "matrix.hpp"
 #include "vectr.hpp"
 #include "random_quantities.hpp"
 #include "test_utils.hpp"
+#include <iostream>
 #include <cmath>
 #include <cassert>
 
@@ -40,7 +41,7 @@ void testLinearRegression(size_t sampleSize=1000, size_t numFeatures=1)
     Vector noise = getRandomVector(sampleSize, -0.2, 0.2);
     Vector y = ((X * weights) + bias) + noise;
 
-    LinearRegressionSolver linRegSolverAna = LinearRegressionSolver();
+    LinearRegressionAnalyticalSolver linRegSolverAna = LinearRegressionAnalyticalSolver();
     LinRegResult lrAna = getLinearRegressionTestResults(linRegSolverAna, X, y);
 
     double learningRate = 1.0e-4;
