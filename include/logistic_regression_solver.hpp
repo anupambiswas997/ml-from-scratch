@@ -2,7 +2,7 @@
 #define LOGISTIC_REGRESSION_SOLVER_HPP
 
 #include "vectr.hpp"
-#include "gradient_descent.hpp"
+#include "gradient_descent_solver.hpp"
 #include "gradient_descent_data.hpp"
 
 class LogisticRegressionSolver:

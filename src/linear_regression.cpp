@@ -1,15 +1,14 @@
 #include "linear_regression.hpp"
-#include <iostream>
 #include "matrix.hpp"
 #include "sparse_matrix.hpp"
 #include "sparse_vector.hpp"
 #include "random_quantities.hpp"
-#include <cmath>
-#include "gradient_descent.hpp"
 #include "index_shuffler.hpp"
+#include <iostream>
+#include <cmath>
 
 LinearRegressionGDSolver::LinearRegressionGDSolver(double learningRate, size_t numStochasticSamples, size_t maxNumIterations, double tolerance)
-:IGradientDescentSolver(maxNumIterations, tolerance),
+:GradientDescentSolver(maxNumIterations, tolerance),
 GradientDescentData(numStochasticSamples, learningRate)
 {
 }
@@ -17,7 +16,7 @@ GradientDescentData(numStochasticSamples, learningRate)
 void LinearRegressionGDSolver::solve(const Matrix& X, const Vector& y)
 {
     setData(X, y);
-    IGradientDescentSolver::solve(X, y);
+    GradientDescentSolver::solve(X, y);
 }
 
 void LinearRegressionGDSolver::evaluateIncrements()
@@ -61,7 +60,6 @@ void LinearRegressionGDSolver::evaluateIncrements()
 
 LinearRegressionSolver::LinearRegressionSolver()
 {
-    std::cout << "Created LinearRegressionSolver object" << std::endl;
 }
 
 void LinearRegressionSolver::solve(const Matrix& X, const Vector& y)

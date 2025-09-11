@@ -1,15 +1,15 @@
-#include "gradient_descent.hpp"
+#include "gradient_descent_solver.hpp"
 #include "random_quantities.hpp"
 #include <cmath>
 #include "matrix.hpp"
 
-IGradientDescentSolver::IGradientDescentSolver(size_t numIterations, double tolerance)
+GradientDescentSolver::GradientDescentSolver(size_t numIterations, double tolerance)
 {
     m_maxIterations = numIterations;
     m_tolerance = tolerance;
 }
 
-bool IGradientDescentSolver::shouldContinueIterating()
+bool GradientDescentSolver::shouldContinueIterating()
 {
     // Compute maximum error
     double absMinWIncrement = fabs(m_weightIncrements.getMin());
@@ -26,12 +26,12 @@ bool IGradientDescentSolver::shouldContinueIterating()
     return incrementCond && iterCond;
 }
 
-void IGradientDescentSolver::log() const
+void GradientDescentSolver::log() const
 {
     // Nothing to log, by default
 }
 
-void IGradientDescentSolver::solve(const Matrix& X, const Vector& y)
+void GradientDescentSolver::solve(const Matrix& X, const Vector& y)
 {
     // Initialize bias and weights.
     m_bias = getRandom();

@@ -2,10 +2,10 @@
 #define LINEAR_REGRESSION_HPP
 
 #include "vectr.hpp"
-#include "gradient_descent.hpp"
+#include "gradient_descent_data.hpp"
+#include "gradient_descent_solver.hpp"
 #include "index_shuffler.hpp"
 #include "simple_solver.hpp"
-#include "gradient_descent_data.hpp"
 
 class LinearRegressionGDSolver:
     virtual public IGradientDescentSolver,

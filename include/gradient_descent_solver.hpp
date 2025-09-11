@@ -4,7 +4,7 @@
 #include "vectr.hpp"
 #include "simple_solver.hpp"
 
-class IGradientDescentSolver: virtual public SimpleSolver
+class GradientDescentSolver: virtual public SimpleSolver
 {
 protected:
     Vector m_weightIncrements;
@@ -14,7 +14,7 @@ protected:
     double m_tolerance;
     double m_maxIncrement;
 public:
-    IGradientDescentSolver(size_t numIterations, double tolerance);
+    GradientDescentSolver(size_t numIterations, double tolerance);
     virtual void evaluateIncrements() = 0;
     virtual bool shouldContinueIterating();
     virtual void log() const;

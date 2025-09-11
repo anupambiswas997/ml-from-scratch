@@ -2,7 +2,7 @@
 #include "ml_functions.hpp"
 
 LogisticRegressionSolver::LogisticRegressionSolver(double learningRate, size_t numStochasticSamples, size_t maxNumIterations, double tolerance)
-:IGradientDescentSolver(maxNumIterations, tolerance),
+:GradientDescentSolver(maxNumIterations, tolerance),
 GradientDescentData(numStochasticSamples, learningRate)
 {
 }
@@ -49,7 +49,7 @@ void LogisticRegressionSolver::evaluateIncrements()
 void LogisticRegressionSolver::solve(const Matrix& X, const Vector& y)
 {
     setData(X, y);
-    IGradientDescentSolver::solve(X, y);
+    GradientDescentSolver::solve(X, y);
 }
 
 Vector LogisticRegressionSolver::getProbability(const Matrix& X) const
