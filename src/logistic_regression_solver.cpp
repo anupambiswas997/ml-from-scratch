@@ -54,7 +54,7 @@ void LogisticRegressionSolver::solve(const Matrix& X, const Vector& y)
 
 Vector LogisticRegressionSolver::getProbability(const Matrix& X) const
 {
-    Vector temp = SimpleSolver::predict(X);
+    Vector temp = BaseSolver::predict(X);
     std::vector<double> res = {};
     for(size_t i = 0; i < X.getNumRows(); i++)
     {
@@ -65,7 +65,7 @@ Vector LogisticRegressionSolver::getProbability(const Matrix& X) const
 
 double LogisticRegressionSolver::getProbability(const Vector& xrow) const
 {
-    return sigmoid(SimpleSolver::predict(xrow));
+    return sigmoid(BaseSolver::predict(xrow));
 }
 
 Vector LogisticRegressionSolver::predict(const Matrix& X) const
