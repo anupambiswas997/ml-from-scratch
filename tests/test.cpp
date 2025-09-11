@@ -155,6 +155,6 @@ int main(int argc, char *argv[])
 {
     srand(time(NULL));
     testLinearRegression(1000, 5);
-    testLogisticRegression(1000, 3);
+    testLogisticRegression(1000, 5);
     return 0;
 }

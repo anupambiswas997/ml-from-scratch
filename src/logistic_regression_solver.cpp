@@ -21,7 +21,7 @@ void LogisticRegressionSolver::evaluateIncrements()
         {
             sum += m_pX->getData()[iActual][j] * m_weights.getData()[j];
         }
-        err.push_back(m_py->getData()[iActual] - sigmoid(sum));
+        err.push_back(sigmoid(sum) - m_py->getData()[iActual]);
     }
     std::vector<double> dCdwVec = {};
     for(size_t i = 0; i < m_numColumns; i++)
