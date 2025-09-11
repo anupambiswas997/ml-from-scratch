@@ -1,9 +1,7 @@
-#include "linear_regression.hpp"
+#include "linear_regression_analytical_solver.hpp"
 #include "matrix.hpp"
 #include "sparse_matrix.hpp"
 #include "sparse_vector.hpp"
-//#include <iostream>
-//#include <cmath>
 
 LinearRegressionAnalyticalSolver::LinearRegressionAnalyticalSolver()
 {

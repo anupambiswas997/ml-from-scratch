@@ -1,4 +1,4 @@
-#include "linear_regression.hpp"
+#include "linear_regression_analytical_solver.hpp"
 #include "linear_regression_GD_solver.hpp"
 #include "logistic_regression_solver.hpp"
 #include "matrix.hpp"
