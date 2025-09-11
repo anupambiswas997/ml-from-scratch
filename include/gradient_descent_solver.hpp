@@ -1,10 +1,10 @@
-#ifndef GRADIENT_DESCENT_HPP
-#define GRADIENT_DESCENT_HPP
+#ifndef GRADIENT_DESCENT_SOLVER_HPP
+#define GRADIENT_DESCENT_SOLVER_HPP
 
 #include "vectr.hpp"
-#include "simple_solver.hpp"
+#include "base_solver.hpp"
 
-class GradientDescentSolver: virtual public SimpleSolver
+class GradientDescentSolver: virtual public BaseSolver
 {
 protected:
     Vector m_weightIncrements;

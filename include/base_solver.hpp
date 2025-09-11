@@ -1,10 +1,10 @@
-#ifndef SIMPLE_SOLVER_HPP
-#define SIMPLE_SOLVER_HPP
+#ifndef BASE_SOLVER_HPP
+#define BASE_SOLVER_HPP
 
 #include "vectr.hpp"
 #include "matrix.hpp"
 
-class SimpleSolver
+class BaseSolver
 {
 protected:
     Vector m_weights;

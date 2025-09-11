@@ -6,7 +6,7 @@
 #include "gradient_descent_data.hpp"
 
 class LogisticRegressionSolver:
-    virtual public IGradientDescentSolver,
+    virtual public GradientDescentSolver,
     virtual public GradientDescentData
 {
 public:

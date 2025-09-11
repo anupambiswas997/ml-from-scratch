@@ -5,10 +5,10 @@
 #include "gradient_descent_data.hpp"
 #include "gradient_descent_solver.hpp"
 #include "index_shuffler.hpp"
-#include "simple_solver.hpp"
+#include "base_solver.hpp"
 
 class LinearRegressionGDSolver:
-    virtual public IGradientDescentSolver,
+    virtual public GradientDescentSolver,
     virtual public GradientDescentData
 {
 public:
@@ -17,7 +17,7 @@ public:
     virtual void solve(const Matrix& X, const Vector& y);
 };
 
-class LinearRegressionSolver: virtual public SimpleSolver
+class LinearRegressionSolver: virtual public BaseSolver
 {
 public:
     LinearRegressionSolver();
