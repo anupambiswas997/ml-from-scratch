@@ -1,10 +1,11 @@
+#include "test_utils.hpp"
 #include "linear_regression_analytical_solver.hpp"
 #include "linear_regression_GD_solver.hpp"
 #include "logistic_regression_solver.hpp"
+#include "decision_tree_regression_solver.hpp"
 #include "matrix.hpp"
 #include "vectr.hpp"
 #include "random_quantities.hpp"
-#include "test_utils.hpp"
 #include <iostream>
 #include <cmath>
 #include <cassert>
@@ -152,10 +153,84 @@ void testLogisticRegression(size_t sampleSize=1000, size_t numFeatures=1)
     std::cout << getTableText(data, headers) << std::endl;
 }
 
+void testDecisionTreeRegression(size_t sampleSize=1000, size_t numFeatures=1)
+{
+    // Prepare X and y data.
+    // Data will be of the following pattern, like, for 2 dimensions (x1, x2):
+    // y = a*x1*x1 + b*x2*x2 + c*x1 + d*x2 + e + noise
+    vector<vector<double> > Xdata = {};
+    vector<double> ydata = {};
+    vector<double> constsAB = {};
+    vector<double> constsCD = {};
+    double constE = getRandom();
+    for(size_t i = 0; i < sampleSize; i++)
+    {
+        vector<double> xrow = {};
+        double noise = getRandom(-0.1, 0.1);
+        double f = constE + noise;
+        for(size_t j = 0; j < numFeatures; j++)
+        {
+            if(constsAB.size() == j)
+            {
+                constsAB.push_back(getRandom() / numFeatures);
+            }
+            if(constsCD.size() == j)
+            {
+                constsCD.push_back(getRandom() / numFeatures);
+            }
+            double xj = getRandom(-3, 3);
+            f += (constsAB[j] * xj * xj + constsCD[j] * xj);
+            xrow.push_back(xj);
+        }
+        Xdata.push_back(xrow);
+        ydata.push_back(f);
+    }
+
+    Matrix X(Xdata);
+    Vector y(ydata);
+    DecisionTreeRegressionSolver DTSolver = DecisionTreeRegressionSolver();
+    DTSolver.solve(X, y);
+
+    // Prepare X and y data for testing, separately.
+    vector<vector<double> > XdataTest = {};
+    vector<double> ydataTest = {};
+    for(size_t i = 0; i < 100; i++)
+    {
+        vector<double> xrow = {};
+        double f = constE;
+        for(size_t j = 0; j < numFeatures; j++)
+        {
+            double xj = getRandom(-3, 3);
+            xrow.push_back(xj);
+            f += (constsAB[j] * xj * xj +  constsCD[j] * xj);
+        }
+        ydataTest.push_back(f);
+        XdataTest.push_back(xrow);
+    }
+    Matrix XTest(XdataTest);
+    Vector yTest(ydataTest);
+
+    // Do the predictions using decision tree solver, for
+    // both train and test data.
+    Vector yPred = DTSolver.predict(X);
+    Vector yTestPred = DTSolver.predict(XTest);
+
+    // Write data in files for visualization purposes.
+    writeXYData(X, y, "DTTrain.csv");
+    writeXYData(X, yPred, "DTTrainPred.csv");
+    writeXYData(XTest, yTest, "DTTest.csv");
+    writeXYData(XTest, yTestPred, "DTTestPred.csv");
+
+    // Compute mean square errors.
+    cout << "Train MSE: " << getMeanSquareError(y, yPred) << endl;
+    cout << "Test MSE : " << getMeanSquareError(yTest, yTestPred) << endl;
+}
+
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    testLinearRegression(1000, 5);
-    testLogisticRegression(1000, 5);
+    //testLinearRegression(1000, 5);
+    //testLogisticRegression(1000, 5);
+    testDecisionTreeRegression(1000);
     return 0;
 }

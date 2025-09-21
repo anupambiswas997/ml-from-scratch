@@ -3,6 +3,9 @@
 #include <vector>
 #include <cassert>
 #include <sstream>
+#include <fstream>
+#include "matrix.hpp"
+#include "vectr.hpp"
 
 #define SHOW_TIME_ELAPSED(MSG , X) \
 { \
@@ -101,4 +104,37 @@ std::string getTableText(const std::vector<std::vector<std::string> >& data, con
         }
     }
     return ss.str();
+}
+
+// This function writes a comma-separated file with X and y data, by augmenting
+// matrix X with vector y.
+void writeXYData(const Matrix& X, const Vector& y, std::string fileName)
+{
+    assert(X.getNumRows() == y.size());
+    assert(y.size() > 0);
+    const std::vector<std::vector<double> >& xm = X.getData();
+    const std::vector<double>& yv = y.getData();
+    std::ofstream outFile(fileName, std::ios::out);
+    for(size_t i = 0; i < X.getNumRows(); i++)
+    {
+        for(size_t j = 0; j < X.getNumColumns(); j++)
+        {
+            outFile << xm[i][j] << ",";
+        }
+        outFile << yv[i] << std::endl;
+    }
+    outFile.close();
+}
+
+double getMeanSquareError(const Vector& y0, const Vector& y1)
+{
+    assert(y0.size() == y1.size());
+    assert(y0.size() > 0);
+    double rss = 0;
+    for(size_t i = 0; i < y0.size(); i++)
+    {
+        double diff = y0.getData()[i] - y1.getData()[i];
+        rss += (diff * diff);
+    }
+    return rss / y0.size();
 }
