@@ -33,6 +33,7 @@ class DecisionTreeRegressionSolver: virtual public BaseSolver
     void buildDecisionTree(const Matrix& X, const Vector& y, const std::vector<size_t>& indicesToInspect, DecisionTree* tree);
 public:
     DecisionTreeRegressionSolver(size_t maxLeafSize=5, bool verbose=false);
+    ~DecisionTreeRegressionSolver();
     size_t getNodeCount() const;
     void describeTree() const;
     virtual void solve(const Matrix& X, const Vector& y);

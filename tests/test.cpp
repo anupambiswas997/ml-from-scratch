@@ -188,8 +188,9 @@ void testDecisionTreeRegression(size_t sampleSize=1000, size_t numFeatures=1)
 
     Matrix X(Xdata);
     Vector y(ydata);
-    DecisionTreeRegressionSolver DTSolver = DecisionTreeRegressionSolver();
+    DecisionTreeRegressionSolver DTSolver = DecisionTreeRegressionSolver(20, true);
     DTSolver.solve(X, y);
+    DTSolver.describeTree();
 
     // Prepare X and y data for testing, separately.
     vector<vector<double> > XdataTest = {};

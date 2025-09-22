@@ -13,7 +13,6 @@ DecisionTree::DecisionTree()
 
 DecisionTree::~DecisionTree()
 {
-    std::cout << "Deleting left and right" << std::endl;
     delete left;
     delete right;
 }
@@ -47,6 +46,15 @@ DecisionTreeRegressionSolver::DecisionTreeRegressionSolver(size_t maxLeafSize, b
     m_nodeCount = 0;
     m_maxLeafSize = maxLeafSize;
     m_verbose = verbose;
+}
+
+DecisionTreeRegressionSolver::~DecisionTreeRegressionSolver()
+{
+    if(m_verbose)
+    {
+        std::cout << "Deleting tree" << std::endl;
+    }
+    delete m_tree;
 }
 
 size_t DecisionTreeRegressionSolver::getNodeCount() const
