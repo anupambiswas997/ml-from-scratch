@@ -31,13 +31,26 @@ std::string DecisionTree::getText() const
     std::ostringstream ss;
     if(isLeaf)
     {
-        ss << "LEAF:VALUE " << value;
+        ss << "LNODE: " << value;
     }
     else
     {
-        ss << "INTERNAL:SPLIT-CONDITION x[" << column << "] < " << splitValue;
+        ss << "INODE: x[" << column << "] < " << splitValue;
     }
     return ss.str();
+}
+
+void DecisionTree::describe(std::string indent) const
+{
+    std::cout << indent << getText() << std::endl;
+    if(left)
+    {
+        left->describe(indent + "   ");
+    }
+    if(right)
+    {
+        right->describe(indent + "   ");
+    }
 }
 
 DecisionTreeRegressionSolver::DecisionTreeRegressionSolver(size_t maxLeafSize, bool verbose)
@@ -62,19 +75,6 @@ size_t DecisionTreeRegressionSolver::getNodeCount() const
     return m_nodeCount;
 }
 
-void DecisionTree::describe(std::string indent) const
-{
-    std::cout << indent << getText() << std::endl;
-    if(left)
-    {
-        left->describe(indent + "   ");
-    }
-    if(right)
-    {
-        right->describe(indent + "   ");
-    }
-}
-
 void DecisionTreeRegressionSolver::describeTree() const
 {
     if(m_tree)
@@ -83,17 +83,19 @@ void DecisionTreeRegressionSolver::describeTree() const
     }
 }
 
-std::pair<size_t, double> getOptimalSplit(const Vector& y, size_t column, const std::vector<size_t>& sortedIndices, double ysum)
+std::pair<size_t, double> getOptimalSplit(const Matrix& X, const Vector& y, size_t column, const std::vector<size_t>& sortedIndices, double ysum)
 {
     double minRSSVal = 0;
     size_t index;
     double xa = 0;
     for(size_t i = 1; i < sortedIndices.size(); i++)
     {
-        xa = (xa * (i - 1) + y[sortedIndices[i]]) / i;
+        size_t lastIndex = sortedIndices[i - 1];
+        xa = (xa * (i - 1) + y[lastIndex]) / i;
         double xb = (ysum - i * xa) / (sortedIndices.size() - i);
         double curRSSVal = -(i * xa * xa + (sortedIndices.size() - i) * xb * xb);
-        if(curRSSVal < minRSSVal)
+        bool isLastValueDifferent = X.getData()[lastIndex][column] != X.getData()[sortedIndices[i]][column];
+        if(isLastValueDifferent && (curRSSVal < minRSSVal))
         {
             minRSSVal = curRSSVal;
             index = i;
@@ -122,7 +124,7 @@ void DecisionTreeRegressionSolver::buildDecisionTree(const Matrix& X, const Vect
         tree->isLeaf = true;
         if(m_verbose)
         {
-            std::cout << "  -> Node " << curNodeId << ": " << tree->getText() << std::endl;
+            std::cout << "\tNode[" << curNodeId << "]: " << tree->getText() << std::endl;
         }
         return;
     }
@@ -133,7 +135,7 @@ void DecisionTreeRegressionSolver::buildDecisionTree(const Matrix& X, const Vect
     for(size_t j = 0; j < X.getNumColumns(); j++)
     {
         std::vector<size_t> sortedIndices = getColumnSortedIndices(X, j, indicesToInspect);
-        std::pair<size_t, double> split = getOptimalSplit(y, j, sortedIndices, ysum);
+        std::pair<size_t, double> split = getOptimalSplit(X, y, j, sortedIndices, ysum);
         if(split.second < minRSSVal)
         {
             minRSSVal = split.second;
@@ -147,7 +149,7 @@ void DecisionTreeRegressionSolver::buildDecisionTree(const Matrix& X, const Vect
     for(size_t i = 0; i < optimalIndices.size(); i++)
     {
         std::vector<size_t>& leftOrRightIndices = (i < optimalIndex) ? leftIndices : rightIndices;
-        leftOrRightIndices.push_back(i);
+        leftOrRightIndices.push_back(optimalIndices[i]);
     }
     tree->isLeaf = false;
     tree->column = optimalColumn;
@@ -158,7 +160,7 @@ void DecisionTreeRegressionSolver::buildDecisionTree(const Matrix& X, const Vect
     tree->right = right;
     if(m_verbose)
     {
-        std::cout << "  -> Node " << curNodeId << ": " << tree->getText() << std::endl;
+        std::cout << "\tNode[" << curNodeId << "]: " << tree->getText() << std::endl;
     }
     buildDecisionTree(X, y, leftIndices, left);
     buildDecisionTree(X, y, rightIndices, right);
