@@ -3,6 +3,7 @@
 #include "linear_regression_GD_solver.hpp"
 #include "logistic_regression_solver.hpp"
 #include "decision_tree_regression_solver.hpp"
+#include "kmeans_solver.hpp"
 #include "matrix.hpp"
 #include "vectr.hpp"
 #include "random_quantities.hpp"
@@ -227,11 +228,59 @@ void testDecisionTreeRegression(size_t sampleSize=1000, size_t numFeatures=1)
     cout << "Test MSE : " << getMeanSquareError(yTest, yTestPred) << endl;
 }
 
+void testKMeansClustering(size_t sampleSize=1000, size_t numClusters=3)
+{
+    // number of features = 2, as that is best for visualization
+    std::vector<std::vector<double> > Xdata = {};
+    std::vector<Vector> centroids = {};
+    double minDistBetweenCentroids = 3;
+    double maxPointDistFromCentroid = 5;
+    double minDistSq = minDistBetweenCentroids * minDistBetweenCentroids;
+    // Determine spread-out centroids.
+    // Centroids will be chosen in a way that they are far away from each other.
+    for(size_t i = 0; i < numClusters; i++)
+    {
+        while(true)
+        {
+            bool centroidFound = true;
+            Vector cen = getRandomVector(2, -10, 10);
+            for(size_t j = 0; j < centroids.size(); j++)
+            {
+                Vector diff = cen - centroids[j];
+                if(diff.dot(diff) < minDistSq)
+                {
+                    centroidFound = false;
+                }
+            }
+            if(centroidFound)
+            {
+                centroids.push_back(cen);
+            }
+        }
+    }
+    double twoPI = 4 * atan(1);
+    for(size_t i =0; i < sampleSize; i++)
+    {
+        // Randomly select a centroid to generate a point about.
+        size_t centroidId = rand() % numClusters;
+        double dist = getRandom(0, maxPointDistFromCentroid);
+        double angle = getRandom(0, twoPI);
+        const std::vector<double>& cen = centroids[centroidId].getData();
+        double x = cen[0] + dist * cos(angle);
+        double y = cen[1] + dist * sin(angle);
+        Xdata.push_back({x, y});
+    }
+    Matrix X(Xdata);
+    KMeansSolver kmeansSolver(3, 10);
+    kmeansSolver.solve(X);
+}
+
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    //testLinearRegression(1000, 5);
-    //testLogisticRegression(1000, 5);
+    testLinearRegression(1000, 5);
+    testLogisticRegression(1000, 5);
     testDecisionTreeRegression(1000);
+    testKMeansClustering(1000, 3);
     return 0;
 }
