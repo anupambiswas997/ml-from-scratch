@@ -26,12 +26,39 @@ std::vector<Vector> getInitialCentroids(const Matrix& X, size_t numCentroids)
     return centroids;
 }
 
-std::vector<size_t> getCentroidAssociations(const Matrix& X, std::vector<Vector>& centroids)
+std::vector<size_t> getCentroidAssociations(const Matrix& X, const std::vector<Vector>& centroids)
 {
     std::vector<size_t> centroidAssociations = {};
     for(size_t i = 0; i < X.getNumRows(); i++)
     {
-        size_t closestCentrodId;
+        size_t closestCentroidId;
+        double closestCentroidDistSq;
+        bool first = true;
+        for(size_t j = 0; j < centroids.size(); j++)
+        {
+            Vector diff = Vector(X.getData()[i]) - centroids[j];
+            double diffSq = diff.dot(diff);
+            if(first || (diffSq < closestCentroidDistSq))
+            {
+                closestCentroidId = j;
+                closestCentroidDistSq = diffSq;
+                first = false;
+            }
+        }
+        centroidAssociations.push_back(closestCentroidId);
+    }
+    return centroidAssociations;
+}
+
+std::pair<std::vector<Vector>, double> getUpdatedCentroids(const Matrix& X, const std::vector<Vector>& centroids)
+{
+    std::vector<Vector> updatedCentroids = {};
+    double averageDistToCentroidsSqr = 0;
+    std::map<size_t, Vector> centroidSums = {};
+    std::map<size_t, size_t> counts = {};
+    for(size_t i = 0; i < X.getNumRows(); i++)
+    {
+        size_t closestCentroidId;
         double closestCentroidDistSq;
         bool first = true;
         for(size_t j = 0; j < centroids.size(); j++)
@@ -41,33 +68,26 @@ std::vector<size_t> getCentroidAssociations(const Matrix& X, std::vector<Vector>
             if(first || (diffSq < closestCentroidDistSq))
             {
                 closestCentroidDistSq = diffSq;
-                closestCentrodId = j;
+                closestCentroidId = j;
             }
             first = false;
         }
-        centroidAssociations.push_back(closestCentrodId);
-    }
-    return centroidAssociations;
-}
-
-std::vector<Vector> getUpdatedCentroids(const Matrix& X, const std::vector<size_t>& centroidAssociations)
-{
-    std::vector<Vector> centroids = {};
-    std::map<size_t, Vector> centroidSums = {};
-    for(size_t i = 0; i < X.getNumRows(); i++)
-    {
-        size_t assoc = centroidAssociations[i];
-        if(centroidSums.count(assoc) == 0)
+        if(centroidSums.count(closestCentroidId) == 0)
         {
-            centroidSums[assoc] = Vector(std::vector<double>(X.getNumColumns(), 0.0));
+            centroidSums[closestCentroidId] = Vector(std::vector<double>(X.getNumColumns(), 0));
+            counts[closestCentroidId] = 0;
         }
-        centroidSums[assoc] = centroidSums[assoc] + Vector(X.getData()[i]);
+        centroidSums[closestCentroidId] = centroidSums[closestCentroidId] + X.getData()[i];
+        averageDistToCentroidsSqr += closestCentroidDistSq;
+        counts[closestCentroidId]++;
     }
-    for(size_t i = 0; i < centroidSums.size(); i++)
+    averageDistToCentroidsSqr /= X.getNumRows();
+    assert(centroidSums.size() == centroids.size());
+    for(size_t i = 0; i < centroids.size(); i++)
     {
-        centroids.push_back(centroidSums[i] * (1.0 / centroidSums[i].size()));
+        updatedCentroids.push_back(centroidSums[i] * (1.0 / counts[i]));
     }
-    return centroids;
+    return std::make_pair(updatedCentroids, averageDistToCentroidsSqr);
 }
 
 bool centroidsHaveChanged(const std::vector<Vector>& oldCentroids, const std::vector<Vector>& newCentroids, double tolerance=1.0e-8)
@@ -86,27 +106,18 @@ bool centroidsHaveChanged(const std::vector<Vector>& oldCentroids, const std::ve
     return false;
 }
 
-std::pair<std::vector<Vector>, double> getConvergedCentroids(const Matrix& X, const std::vector<Vector>& initialCentroids)
+std::pair<std::vector<Vector>, double> getConvergedCentroids(const Matrix& X, size_t numCentroids)
 {
-    std::vector<Vector> centroids = initialCentroids;
+    std::vector<Vector> centroids = getInitialCentroids(X, numCentroids);
     double avgDistToCentroidSq = 0;
     bool shouldIterate = true;
     while(shouldIterate)
     {
-        std::vector<size_t> centroidAssociations = getCentroidAssociations(X, centroids);
-        std::vector<Vector> updatedCentroids = getUpdatedCentroids(X, centroidAssociations);
-        shouldIterate = centroidsHaveChanged(centroids, updatedCentroids);
-        centroids = updatedCentroids;
-        if(!shouldIterate)
-        {
-            for(size_t i = 0; i < X.getNumRows(); i++)
-            {
-                Vector diff = Vector(X.getData()[i]) - centroids[centroidAssociations[i]];
-                avgDistToCentroidSq += diff.dot(diff);
-            }
-        }
+        std::pair<std::vector<Vector>, double> updates = getUpdatedCentroids(X, centroids);
+        shouldIterate = centroidsHaveChanged(centroids, updates.first);
+        centroids = updates.first;
+        avgDistToCentroidSq = updates.second;
     }
-    avgDistToCentroidSq /= X.getNumRows();
     return std::make_pair(centroids, avgDistToCentroidSq);
 }
 
@@ -116,8 +127,7 @@ void KMeansSolver::solve(const Matrix& X)
     bool first = true;
     for(size_t iter = 0; iter < m_numTrials; iter++)
     {
-        std::vector<Vector> initialCentroids = getInitialCentroids(X, m_numCentroids);
-        std::pair<std::vector<Vector>, double> centroidsAndDistSqSum = getConvergedCentroids(X, initialCentroids);
+        std::pair<std::vector<Vector>, double> centroidsAndDistSqSum = getConvergedCentroids(X, m_numCentroids);
         if(first || (avgDistToCentroidSqMin > centroidsAndDistSqSum.second))
         {
             m_centroids = centroidsAndDistSqSum.first;

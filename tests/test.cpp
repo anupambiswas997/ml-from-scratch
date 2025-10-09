@@ -255,6 +255,7 @@ void testKMeansClustering(size_t sampleSize=1000, size_t numClusters=3)
             if(centroidFound)
             {
                 centroids.push_back(cen);
+                break;
             }
         }
     }
@@ -273,14 +274,20 @@ void testKMeansClustering(size_t sampleSize=1000, size_t numClusters=3)
     Matrix X(Xdata);
     KMeansSolver kmeansSolver(3, 10);
     kmeansSolver.solve(X);
+    std::vector<Vector> centroidsFinal = kmeansSolver.getCentroids();
+    std::cout << "Final centroids:" << std::endl;
+    for(const auto& cen: centroidsFinal)
+    {
+        std::cout << "\t" << cen.getText() << std::endl;
+    }
 }
 
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    testLinearRegression(1000, 5);
-    testLogisticRegression(1000, 5);
-    testDecisionTreeRegression(1000);
+    //testLinearRegression(1000, 5);
+    //testLogisticRegression(1000, 5);
+    //testDecisionTreeRegression(1000);
     testKMeansClustering(1000, 3);
     return 0;
 }
